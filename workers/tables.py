@@ -1,12 +1,13 @@
 import os
+import ray
 import duckdb
 
 import pandas as pd
 
-
-def table_transformer(conn, tabname, colname, sql, tables=['train', 'test', 'validation']):
+@ray.remote
+def table_transformer(db, tabname, colname, sql, tables=['train', 'test', 'validation']):
     dfs = []
-
+    conn = duckdb.connect(db, read_only=True)
     df = conn.execute(sql).fetchdf()
 
     df.tconst = df.tconst.apply(lambda x: f'tt{str(x).zfill(7)}')
