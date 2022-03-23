@@ -41,6 +41,9 @@ if __name__ == '__main__':
     if os.path.exists(os.path.join('db', 'structured.duckdb')):
         os.remove(os.path.join('db', 'structured.duckdb'))
 
+    # init resources
+    ray.init(num_cpus=4)
+
     # transform external data
     p1 = table_transformer.remote(db,
                                   'mtRatings',
