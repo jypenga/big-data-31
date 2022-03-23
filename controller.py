@@ -1,4 +1,5 @@
 import os
+import time
 import math
 import duckdb
 import unidecode
@@ -19,41 +20,44 @@ def store(result):
 def connect():
     return duckdb.connect(os.path.join('db', 'unstructured.duckdb'), read_only=True)
 
-
-if __name__ == '__main__':
-    if os.path.exists(os.path.join('db', 'structured.duckdb')):
-        os.remove(os.path.join('db', 'structured.duckdb'))
-
-    names, dfs = [], []
-
-    # cleaning numerical values
-    def cleaner(x, filler=0):
-        if x == r'\N':
+# cleaning numerical values
+def f1():
+    if x == r'\N':
             return int(filler)
         else:
             return int(x)
 
-    store(column_cleaner(connect(), 'startYear', lambda x: cleaner(x)))
-    store(column_cleaner(connect(), 'endYear', cleaner))
-    store(column_cleaner(connect(), 'runtimeMinutes', cleaner))
 
-    def cleaner(x):
+def f2(x):
         if x == 'nan' or x == "NaN" or math.isnan(x):
             return int()
         else:
             return int(x)
 
-    store(column_cleaner(connect(), 'numVotes', cleaner))
 
-    # cleaning text-like values
-    def cleaner(x):
-        if isinstance(x, str):
+# cleaning text-like values
+def f3(x):
+    if isinstance(x, str):
             return unidecode.unidecode(x)
         else:
             return ''
 
-    store(column_cleaner(connect(), 'originalTitle', cleaner))
-    store(column_cleaner(connect(), 'primaryTitle', cleaner))
+
+if __name__ == '__main__':
+    t0 = time.time()
+
+    if os.path.exists(os.path.join('db', 'structured.duckdb')):
+        os.remove(os.path.join('db', 'structured.duckdb'))
+
+    names, dfs = [], []
+
+    # clean and separate feature columns
+    store(column_cleaner(connect(), 'startYear', f1))
+    store(column_cleaner(connect(), 'endYear', f1))
+    store(column_cleaner(connect(), 'runtimeMinutes', f1))
+    store(column_cleaner(connect(), 'numVotes', f2))
+    store(column_cleaner(connect(), 'originalTitle', f3))
+    store(column_cleaner(connect(), 'primaryTitle', f3))
 
     # transforming labels
     store(column_cleaner(connect(), 'label', tables=['train']))
@@ -85,3 +89,4 @@ if __name__ == '__main__':
         conn.execute(f'CREATE TABLE {name} AS SELECT * FROM {name}')
 
     conn.close()
+    print(f'runtime: {round(time.time() - t0, 2)}s')
