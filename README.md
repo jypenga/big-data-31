@@ -10,6 +10,6 @@ python controller.py
 
 cd ml
 
-python ml/train.py
+python train.py
 
-python ml/predict.py
+python predict.py
