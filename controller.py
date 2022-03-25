@@ -14,7 +14,7 @@ from workers.tables import table_transformer
 # cleaning numerical values
 def f1(x):
     if x == r'\N':
-            return int()
+        return int()
     else:
         return int(x)
 
@@ -29,7 +29,7 @@ def f2(x):
 # cleaning text-like values
 def f3(x):
     if isinstance(x, str):
-            return unidecode.unidecode(x)
+        return unidecode.unidecode(x)
     else:
         return ''
 
