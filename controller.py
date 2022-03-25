@@ -98,7 +98,6 @@ if __name__ == '__main__':
         if fname.endswith('directors.csv') or fname.endswith('writers.csv'):
             name = fname.split('.')[0]
             df = pd.read_csv(os.path.join('dump', fname))
-            df = df.drop_duplicates()
             conn.register(name, df)
             conn.execute(f'CREATE TABLE {name} AS SELECT * FROM {name}')
         
