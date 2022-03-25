@@ -20,6 +20,7 @@ ParseDirectors <- function(paths, con, i){
   dbDisconnect(duckdb, shutdown = T)
   
   train = merge(train, directors, by.x = "tconst", by.y = "movie", all.x = T)
+  train = train[!duplicated(tconst)]
   
   # TARGET ENCODING
   # First infer the most frequent value for numvotes
