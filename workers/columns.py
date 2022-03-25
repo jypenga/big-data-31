@@ -1,6 +1,7 @@
 import os
 import ray
 import duckdb
+import configparser
 
 import pandas as pd
 
@@ -19,3 +20,14 @@ def column_cleaner(db, colname, cleaner=lambda x: x, tables=['train', 'test', 'v
     names = [f'{name}_{colname}' for name in tables]
 
     return names, dfs
+
+@ray.remote
+def column_cleaner_R(fname):
+    config = configparser.ConfigParser()
+    config.readfp(open(os.path.join('R', 'config.txt')))
+    r_path = os.path.join(*config.get('Paths', 'r_path').split('\\'), 'bin', 'Rscript.exe')
+
+    outp = os.popen(f'{r_path} {os.path.join("R", fname)}')
+    names = outp.read().split('\n')[-3:]
+    
+    return names

@@ -1,1 +1,2 @@
-r_path="C:\Program Files\R\R-4.1.0"
+[Paths]
+r_path="C:\Program Files\R\R-4.1.3"

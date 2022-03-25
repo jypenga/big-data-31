@@ -11,6 +11,7 @@ echo %r_path%
 %r_path%\bin\RScript.exe  -e "install.packages('jsonlite', repos='https://cran.rstudio.com/')"&
 %r_path%\bin\RScript.exe  -e "install.packages('mltools', repos='https://cran.rstudio.com/')"&
 %r_path%\bin\RScript.exe  -e "install.packages('stringr', repos='https://cran.rstudio.com/')"&
+%r_path%\bin\RScript.exe  -e "install.packages('duckdb', repos='https://cran.rstudio.com/')"&
 
 
 

@@ -7,7 +7,7 @@ import unidecode
 
 import numpy as np
 
-from workers.columns import column_cleaner
+from workers.columns import column_cleaner, column_cleaner_R
 from workers.tables import table_transformer
 
 
@@ -72,7 +72,11 @@ if __name__ == '__main__':
     p8 = column_cleaner.remote(db, 'primaryTitle', f3)
     p9 = column_cleaner.remote(db, 'label', tables=['train'])
 
-    results = ray.get([p1, p2, p3, p4, p5, p6, p7, p8, p9])
+    # R cleaners
+    p10 = column_cleaner_R.remote('writers.R')
+    p11 = column_cleaner_R.remote('directors.R')
+
+    *results, writer_names, director_names = ray.get([p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11])
     ray.shutdown()
 
     # refactor results
@@ -84,10 +88,17 @@ if __name__ == '__main__':
 
     # dump all
     conn = duckdb.connect(os.path.join('db', 'structured.duckdb'), read_only=False)
+    conn_b = duckdb.connect(os.path.join('db', 'unstructured.duckdb'), read_only=True)
     
     for name, df in zip(names, dfs):
         conn.register(name, df)
         conn.execute(f'CREATE TABLE {name} AS SELECT * FROM {name}')
-
+    
+    for name in (writer_names + director_names):
+        df = conn_b.execute(f'SELECT * FROM {name}').fetchdf()
+        conn.register(name, df)
+        conn.execute(f'CREATE TABLE {name} AS SELECT * FROM {name}')
+        
     conn.close()
+    conn_b.close()
     print(f'runtime: {round(time.time() - t0, 2)}s')
