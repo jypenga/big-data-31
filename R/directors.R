@@ -32,7 +32,7 @@ ParseDirectors <- function(paths, con, i){
 
 
 for(i in tables$directors){
-  ParseWriters(paths, con, i)
+  ParseDirectors(paths, con, i)
 }
 
 
