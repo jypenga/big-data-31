@@ -1,15 +1,9 @@
 Make sure that all imdb data and extra files are contained in /dump
 
-cd db
+cd R
 
-python init.py
+Rinit.bat
 
 cd ..
 
-python controller.py
-
-cd ml
-
-python train.py
-
-python predict.py
+run.bat
