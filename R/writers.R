@@ -7,23 +7,11 @@ source(paste0(paths$current, "R/main.R"))
 
 ParseWriters <- function(paths, con){
   
-  # format json
-  writer_files = read_json(paste0(paths$current, "dump/writing.json"))
-  
-  # unlist json file
-  json_file <- lapply(writer_files, function(x) {
-    x[sapply(x, is.null)] <- NA
-    unlist(x)
-  })
-  
-  # bind columns to create data frame
-  df <- as.data.frame(do.call("cbind", json_file))
-  
-  # from data frame to data table
-  writers = as.data.table(df)
-  
   # start duckdb connection
   duckdb = dbConnect(con$connection, dbdir = con$directory, read_only=FALSE)
+  
+  # extract writers from duckdb
+  writers = as.data.table(dbGetQuery(duckdb, "SELECT movie, writers FROM writing"))
   
   train = as.data.table(dbGetQuery(duckdb, "SELECT tconst, numVotes FROM train"))
   

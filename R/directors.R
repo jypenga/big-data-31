@@ -7,23 +7,11 @@ source(paste0(paths$current, "R/main.R"))
 
 ParseDirectors <- function(paths, con){
   
-  # format json
-  director_files = read_json(paste0(paths$data, "directing.json"))
-  
-  # unlist json file
-  json_file <- lapply(director_files, function(x) {
-    x[sapply(x, is.null)] <- NA
-    unlist(x)
-  })
-  
-  # bind columns to create data frame
-  df <- as.data.frame(do.call("cbind", json_file))
-  
-  # from data frame to data table
-  directors = as.data.table(df)
-  
   # start duckdb connection
   duckdb = dbConnect(con$connection, dbdir = con$directory, read_only=FALSE)
+  
+  # extract directors from duckdb
+  directors = as.data.table(dbGetQuery(duckdb, "SELECT movie, director FROM directing"))
   
   # select tconst columns
   train = as.data.table(dbGetQuery(duckdb, "SELECT tconst, numVotes FROM train"))
