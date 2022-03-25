@@ -19,16 +19,14 @@ con = list(connection = duckdb::duckdb(), directory = paste0(paths$data, "db.duc
 TargetEncoding <- function(dt, cols, values){
   
   # TARGET ENCODING
-  # First infer the most frequent value for numvotes
-  setDT(dt)[, N:=.N, values][N==max(N)][, N:=NULL]
-  most_frequent <- max(dt[N != max(N)]$N)
-  most_frequent_votes = first(dt[N == most_frequent]$numVotes)
+  # First infer the mean value for numvotes
+  mean_votes = colMeans(dt[!is.na(dt[[values]]), ..values])
   
   # set the missing values to this value
-  dt = dt[is.na(dt[[values]]), c(values) := most_frequent_votes]
-
+  dt = dt[is.na(dt[[values]]), c(values) := mean_votes]
+  
   #calculate mean numvotes per director
-  dt = dt[, value_mean := lapply(.SD, mean), .SDcols = c(values), by= c(cols)]
+  dt = dt[!is.na(dt[[values]]), value_mean := lapply(.SD, mean), .SDcols = c(values), by= c(cols)]
   
   return(dt)
   
