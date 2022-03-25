@@ -15,6 +15,9 @@ ParseWriters <- function(paths, con, i){
   
   train = as.data.table(dbGetQuery(duckdb, paste0("SELECT tconst, numVotes FROM ", i)))
   
+  # close duckdb connection
+  dbDisconnect(duckdb, shutdown = T)
+  
   writers = merge(writers, train, by.x = "movie", by.y = "tconst", all.x = T)
   
   # TARGET ENCODING
@@ -30,10 +33,9 @@ ParseWriters <- function(paths, con, i){
   train = merge(train[, .(tconst)], writers, by.x = "tconst", by.y = "movie", all.x = T)
   
   cat("writing to writers table")
-  dbWriteTable(duckdb, paste0(i, "_writers"), train, overwrite = TRUE)
-  
-  dbDisconnect(duckdb, shutdown = T)
-  
+  #dbWriteTable(duckdb, paste0(i, "_writers"), train, overwrite = TRUE)
+  write.csv(train, paste0(paths$data, i, "_writers.csv"))
+
 }
 
 for(i in tables$writers){

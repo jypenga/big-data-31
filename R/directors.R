@@ -16,6 +16,9 @@ ParseDirectors <- function(paths, con, i){
   # select tconst columns
   train = as.data.table(dbGetQuery(duckdb, paste0("SELECT tconst, numVotes FROM ", i)))
   
+  # close duckdb connection
+  dbDisconnect(duckdb, shutdown = T)
+  
   train = merge(train, directors, by.x = "tconst", by.y = "movie", all.x = T)
   
   # TARGET ENCODING
@@ -25,8 +28,8 @@ ParseDirectors <- function(paths, con, i){
   train = train[, .(tconst, director_mean = value_mean)]
   
   cat("writing to directors table")
-  dbWriteTable(duckdb, paste0(i, "_directors"), train, overwrite = TRUE)  
-  dbDisconnect(duckdb, shutdown = T)
+  #dbWriteTable(duckdb, paste0(i, "_directors"), train, overwrite = TRUE)  
+  write.csv(train, paste0(paths$data, i, "_directors.csv"))
   
 }
 
