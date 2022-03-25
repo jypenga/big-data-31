@@ -8,27 +8,12 @@ import unidecode
 import numpy as np
 import pandas as pd
 
-from workers.columns import column_cleaner, column_cleaner_R
+from workers.columns import column_cleaner, column_cleaner_avg, column_cleaner_nan_avg, column_cleaner_R
 from workers.tables import table_transformer
 
 
-# cleaning numerical values
-def f1(x):
-    if x == r'\N':
-        return int()
-    else:
-        return int(x)
-
-
-def f2(x):
-    if x == 'nan' or x == "NaN" or math.isnan(x):
-        return int()
-    else:
-        return int(x)
-
-
 # cleaning text-like values
-def f3(x):
+def f(x):
     if isinstance(x, str):
         return unidecode.unidecode(x)
     else:
@@ -65,19 +50,19 @@ if __name__ == '__main__':
                                   GROUP BY ml_links.imdbId""")
 
     # clean and separate feature and label columns
-    p3 = column_cleaner.remote(db, 'startYear', f1)
-    p4 = column_cleaner.remote(db, 'endYear', f1)
-    p5 = column_cleaner.remote(db, 'runtimeMinutes', f1)
-    p6 = column_cleaner.remote(db, 'numVotes', f2)
-    p7 = column_cleaner.remote(db, 'originalTitle', f3)
-    p8 = column_cleaner.remote(db, 'primaryTitle', f3)
+    p3 = column_cleaner_avg.remote(db, 'startYear')
+    p4 = column_cleaner_avg.remote(db, 'endYear')
+    p5 = column_cleaner_avg.remote(db, 'runtimeMinutes')
+    p6 = column_cleaner_nan_avg.remote(db, 'numVotes')
+    p7 = column_cleaner.remote(db, 'originalTitle', f)
+    p8 = column_cleaner.remote(db, 'primaryTitle', f)
     p9 = column_cleaner.remote(db, 'label', tables=['train'])
 
     # R cleaners
     p10 = column_cleaner_R.remote('writers.R')
     p11 = column_cleaner_R.remote('directors.R')
 
-    *results, writer_names, director_names = ray.get([p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11])
+    *results, _, _ = ray.get([p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11])
     ray.shutdown()
 
     # refactor results
@@ -94,12 +79,13 @@ if __name__ == '__main__':
         conn.register(name, df)
         conn.execute(f'CREATE TABLE {name} AS SELECT * FROM {name}')
 
-    for fname in os.listdir('dump'):
-        if fname.endswith('directors.csv') or fname.endswith('writers.csv'):
+    for fname in os.listdir('R'):
+        if fname.endswith('writers.csv') or fname.endswith('directors.csv'):
             name = fname.split('.')[0]
-            df = pd.read_csv(os.path.join('dump', fname))
+            df = pd.read_csv(os.path.join('R', fname))
             conn.register(name, df)
             conn.execute(f'CREATE TABLE {name} AS SELECT * FROM {name}')
+            os.remove(os.path.join('R', fname))
         
     conn.close()
     print(f'runtime: {round(time.time() - t0, 2)}s')

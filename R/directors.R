@@ -17,6 +17,7 @@ ParseDirectors <- function(paths, con, i){
   train = as.data.table(dbGetQuery(duckdb, paste0("SELECT tconst, numVotes FROM ", i)))
   
   train = merge(train, directors, by.x = "tconst", by.y = "movie", all.x = T)
+  train = train[!duplicated(tconst)]
   
   # TARGET ENCODING
   # First infer the most frequent value for numvotes

@@ -6,7 +6,7 @@ options(warn=-1)
 paths <- list()
 paths[["current"]] <- paste0(getwd(), "/")
 paths[["db"]] <- paste0(paths$current, "db/")
-paths[["data"]] <- paste0(paths$current, "dump/")
+paths[["data"]] <- paste0(paths$current, "R/")
 
 # libraries
 library("DBI")

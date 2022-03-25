@@ -56,40 +56,40 @@ if __name__ == '__main__':
     X_train_with_ratings, X_test_with_ratings, y_train_with_ratings, y_test_with_ratings = \
     train_test_split(X_with_ratings, y_with_ratings, test_size=0.2, random_state=1)
 
-    # keras2model_without_ratings = MLP(input_shape=(5,))
-    # keras2model_without_ratings.compile(optimizer='adam',
-    #                                     loss='binary_crossentropy',
-    #                                     metrics=['accuracy'])
+    keras2model_without_ratings = MLP(input_shape=(7,))
+    keras2model_without_ratings.compile(optimizer='adam',
+                                        loss='binary_crossentropy',
+                                        metrics=['accuracy'])
 
-    # print("===== Training without ratings")
-    # keras2model_without_ratings.fit(X_train_without_ratings, y_train_without_ratings, epochs=EPOCHS, batch_size=1)
-    # keras2model_without_ratings.save('keras2model_without_ratings')
+    print("===== Training without ratings")
+    keras2model_without_ratings.fit(X_train_without_ratings, y_train_without_ratings, epochs=EPOCHS, batch_size=1)
+    keras2model_without_ratings.save('keras2model_without_ratings')
 
-    # loss_and_metrics = keras2model_without_ratings.evaluate(X_test_without_ratings, y_test_without_ratings)
-    # print('Loss without ratings = ', loss_and_metrics[0])
-    # print('Accuracy without ratings = ', loss_and_metrics[1])
+    loss_and_metrics = keras2model_without_ratings.evaluate(X_test_without_ratings, y_test_without_ratings)
+    print('Loss without ratings = ', loss_and_metrics[0])
+    print('Accuracy without ratings = ', loss_and_metrics[1])
 
-    # keras2model_with_ratings = MLP(input_shape=(6,))
-    # keras2model_with_ratings.compile(optimizer='adam',
-    #                                  loss='binary_crossentropy',
-    #                                  metrics=['accuracy'])
+    keras2model_with_ratings = MLP(input_shape=(8,))
+    keras2model_with_ratings.compile(optimizer='adam',
+                                     loss='binary_crossentropy',
+                                     metrics=['accuracy'])
 
-    # print("===== Training with ratings")
-    # keras2model_with_ratings.fit(X_train_with_ratings, y_train_with_ratings, epochs=EPOCHS, batch_size=1)
-    # keras2model_with_ratings.save('keras2model_with_ratings')
+    print("===== Training with ratings")
+    keras2model_with_ratings.fit(X_train_with_ratings, y_train_with_ratings, epochs=EPOCHS, batch_size=1)
+    keras2model_with_ratings.save('keras2model_with_ratings')
 
-    # loss_and_metrics = keras2model_with_ratings.evaluate(X_test_with_ratings, y_test_with_ratings)
-    # print('Loss with ratings = ', loss_and_metrics[0])
-    # print('Accuracy with ratings = ', loss_and_metrics[1])
+    loss_and_metrics = keras2model_with_ratings.evaluate(X_test_with_ratings, y_test_with_ratings)
+    print('Loss with ratings = ', loss_and_metrics[0])
+    print('Accuracy with ratings = ', loss_and_metrics[1])
 
-    model = XGBClassifier()
-    model.fit(X_train_without_ratings, y_train_without_ratings)
-    model.save_model('xgb_without_ratings.json')
+    # model = XGBClassifier()
+    # model.fit(X_train_without_ratings, y_train_without_ratings)
+    # model.save_model('xgb_without_ratings.json')
 
-    print(model.score(X_test_without_ratings, y_test_without_ratings))
+    # print(model.score(X_test_without_ratings, y_test_without_ratings))
 
-    model = XGBClassifier()
-    model.fit(X_train_with_ratings, y_train_with_ratings)
-    model.save_model('xgb_with_ratings.json')
+    # model = XGBClassifier()
+    # model.fit(X_train_with_ratings, y_train_with_ratings)
+    # model.save_model('xgb_with_ratings.json')
 
-    print(model.score(X_test_with_ratings, y_test_with_ratings))
+    # print(model.score(X_test_with_ratings, y_test_with_ratings))

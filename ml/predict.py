@@ -71,10 +71,13 @@ if __name__ == '__main__':
     full_validation_array_without_ratings = standardizer.fit_transform(full_validation_array_without_ratings)
     full_validation_array_with_ratings = standardizer.fit_transform(full_validation_array_with_ratings)
 
-    model_without_ratings = XGBClassifier()
-    model_without_ratings.load_model('xgb_without_ratings.json')
-    model_with_ratings = XGBClassifier()
-    model_with_ratings.load_model('xgb_with_ratings.json')
+    # model_without_ratings = XGBClassifier()
+    # model_without_ratings.load_model('xgb_without_ratings.json')
+    # model_with_ratings = XGBClassifier()
+    # model_with_ratings.load_model('xgb_with_ratings.json')
+
+    model_without_ratings = keras.models.load_model('keras2model_without_ratings')
+    model_with_rating = keras.models.load_model('keras2model_without_ratings')
     
     test_predictions_without_ratings = model_without_ratings.predict(full_test_array_without_ratings)
     test_predictions_without_ratings = list(map(lambda x: False if x<0.5 else True, test_predictions_without_ratings))
