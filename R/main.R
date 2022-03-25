@@ -13,6 +13,11 @@ library("jsonlite")
 library("mltools")
 library("stringr")
 
+# define tables that need processing
+tables = list()
+tables$writers = c("train", "validation", "test")
+tables$directors = c("train", "validation", "test")
+
 # connect database
 con = list(connection = duckdb::duckdb(), directory = paste0(paths$data, "db.duckdb"))
 
