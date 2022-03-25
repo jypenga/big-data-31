@@ -8,7 +8,7 @@ source(paste0(paths$current, "R/main.R"))
 ParseDirectors <- function(paths, con, i){
   
   # start duckdb connection
-  duckdb = dbConnect(con$connection, dbdir = con$directory, read_only=FALSE)
+  duckdb = dbConnect(con$connection, dbdir = con$directory, read_only=TRUE)
   
   # extract directors from duckdb
   directors = as.data.table(dbGetQuery(duckdb, "SELECT movie, director FROM directing"))
@@ -22,12 +22,11 @@ ParseDirectors <- function(paths, con, i){
   # First infer the most frequent value for numvotes
   train = TargetEncoding(train, "director", "numVotes")
   
-  train = train[, .(tconst, director_mean = value_mean)]
+  train = train[, .(tconst, directors = value_mean)]
   
-  dbWriteTable(duckdb, paste0(i, "_directors"), train, overwrite = TRUE)  
   dbDisconnect(duckdb, shutdown = T)
   
-  cat(paste0('\n', i, '_directors'))
+  write.csv(train, paste0(paths$data, i, "_directors.csv"), row.names=FALSE)
 }
 
 for(i in tables$directors){

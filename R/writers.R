@@ -8,7 +8,7 @@ source(paste0(paths$current, "R/main.R"))
 ParseWriters <- function(paths, con, i){
   
   # start duckdb connection
-  duckdb = dbConnect(con$connection, dbdir = con$directory, read_only=FALSE)
+  duckdb = dbConnect(con$connection, dbdir = con$directory, read_only=TRUE)
   
   # extract writers from duckdb
   writers = as.data.table(dbGetQuery(duckdb, "SELECT movie, writer FROM writing"))
@@ -28,11 +28,10 @@ ParseWriters <- function(paths, con, i){
   
   # select tconst columns
   train = merge(train[, .(tconst)], writers, by.x = "tconst", by.y = "movie", all.x = T)
-  
-  dbWriteTable(duckdb, paste0(i, "_writers"), train, overwrite = TRUE)
+  train = train[, .(tconst, writers = writer1)]
   dbDisconnect(duckdb, shutdown = T)
 
-  cat(paste0('\n', i, '_writers'))
+  write.csv(train, paste0(paths$data, i, "_writers.csv"), row.names=FALSE)
 }
 
 for(i in tables$writers){

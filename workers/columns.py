@@ -28,6 +28,7 @@ def column_cleaner_R(fname):
     r_path = os.path.join(*config.get('Paths', 'r_path').split('\\'), 'bin', 'Rscript.exe')
 
     outp = os.popen(f'{r_path} {os.path.join("R", fname)}')
-    names = outp.read().split('\n')[-3:]
+    outp.read()
+    outp.close()
     
-    return names
+    return

@@ -6,6 +6,7 @@ import duckdb
 import unidecode
 
 import numpy as np
+import pandas as pd
 
 from workers.columns import column_cleaner, column_cleaner_R
 from workers.tables import table_transformer
@@ -88,17 +89,18 @@ if __name__ == '__main__':
 
     # dump all
     conn = duckdb.connect(os.path.join('db', 'structured.duckdb'), read_only=False)
-    conn_b = duckdb.connect(os.path.join('db', 'unstructured.duckdb'), read_only=True)
     
     for name, df in zip(names, dfs):
         conn.register(name, df)
         conn.execute(f'CREATE TABLE {name} AS SELECT * FROM {name}')
-    
-    for name in (writer_names + director_names):
-        df = conn_b.execute(f'SELECT * FROM {name}').fetchdf()
-        conn.register(name, df)
-        conn.execute(f'CREATE TABLE {name} AS SELECT * FROM {name}')
+
+    for fname in os.listdir('dump'):
+        if fname.endswith('directors.csv') or fname.endswith('writers.csv'):
+            name = fname.split('.')[0]
+            df = pd.read_csv(os.path.join('dump', fname))
+            df = df.drop_duplicates()
+            conn.register(name, df)
+            conn.execute(f'CREATE TABLE {name} AS SELECT * FROM {name}')
         
     conn.close()
-    conn_b.close()
     print(f'runtime: {round(time.time() - t0, 2)}s')
